@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker</title>
+    <style>
+        table,th{
+            border:3px solid black;
+            margin-top: 50px;
+            border-collapse:collapse;
+        }
+        td{
+            border:1px;
+            border-style: solid ;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <form onsubmit="addList(event)" id="form">
+            <legend>
+                <label for="expense-input">Amount</label>
+               <input type="number" id="expense-input" class="input" required>
+               <label for="description-input">Description</label>
+               <input type="text" id="description-input" class="input" required>
+               <label for="category">Category</label>
+             <select name="category" id="category" value="category">
+                <option value="Movie">Movie</option>
+                <option value="HH">HouseHold</option>
+                <option value="Reant and Fare">Rent and fare</option>
+                <option value="Other">other</option>
+             </select>
+             <button id="submit">Submit</button>
+                
+
+            </legend>
+
+        </form>
+        <div>
+            <table class="table" id="add-expense" style="width:80vw">
+                <tr>
+                <th>Amount</th>
+                <th>Description</th>
+                <th>Category</th>
+                <th>Edit</th>
+                <th>Remove</th>
+            </tr>
+           
+            </table>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.1.2/axios.min.js"></script>
+    <script >
+
+
+
+
+function addList(event){
+event.preventDefault();
+
+
+    
+let getAmt=document.getElementById("expense-input").value;
+let getDes=document.getElementById("description-input").value;
+var select = document.getElementById('category');
+var getCat = select.options[select.selectedIndex].value;
+
+
+
+const obj={
+    getAmt,
+    getDes,
+    getCat
+}
+let url="https://crudcrud.com/api/72714842b91b4da1b22b8714e45015a1/expenseData";
+axios.post(url,obj)
+ .then((res)=>{
+    displayExpense(res.data);
+ })
+ .catch(err=>console.log(err))
+
+
+
+}
+
+function displayExpense(object){
+    
+document.getElementById("expense-input").value="";
+document.getElementById("description-input").value="";
+document.getElementById("category").value="";
+
+const parentNode=document.getElementById("add-expense")
+const childHTML=`
+                <tr id=${object.getDes}>
+                <td>${object.getAmt}</td>
+                <td>${object.getDes}</td>
+                <td>${object.getCat}</td>
+                
+                <td><button onclick=editObj('${object.getAmt}','${object.getDes}','${object.getCat}','${object._id}')>Edit</button></td>
+                <td><button onclick =delObj('${object.des}','${object._id}')>X</button></td>
+                </tr>
+                
+                `
+if(parentNode.innerHTML){
+    parentNode.innerHTML+=childHTML;
+}
+
+}
+
+
+window.addEventListener('DOMContentLoaded',()=>{
+    let url="https://crudcrud.com/api/72714842b91b4da1b22b8714e45015a1/expenseData";
+
+    axios.get(url)
+        .then((response)=>{
+            response.data.forEach(element => {
+                displayExpense(element);
+                
+            });
+        })
+
+})
+
+function editObj(amount,description,category,Id){
+
+document.getElementById("expense-input").value=amount;
+document.getElementById("description-input").value=description;
+document.getElementById("category").value=category;
+
+delObj(description,Id);
+}
+
+
+
+function delObj(description,Id){
+    document.getElementById(description).remove();
+    axios.delete(`https://crudcrud.com/api/72714842b91b4da1b22b8714e45015a1/expenseData/${Id}`);
+    
+
+}
+
+
+    </script>
+    
+</body>
+</html>
